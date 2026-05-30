@@ -2,15 +2,16 @@
 # 构建上下文为仓库根(pnpm workspace 需要根清单与 @gongkao/ui 包)
 FROM node:22-slim AS build
 RUN corepack enable
-# 国内构建加速:用淘宝 npmmirror 镜像(registry.npmjs.org 在国内常超时)
-ENV npm_config_registry=https://registry.npmmirror.com
+# 国内构建加速:corepack 取 pnpm + pnpm 装依赖都走淘宝 npmmirror(npmjs.org 国内超时)
+ENV COREPACK_NPM_REGISTRY=https://registry.npmmirror.com
 WORKDIR /repo
+RUN echo 'registry=https://registry.npmmirror.com' > .npmrc
 
 # 先复制清单,利用层缓存(仅清单变动才重装依赖)
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY frontend/apps/web/package.json frontend/apps/web/
 COPY frontend/packages frontend/packages
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --registry=https://registry.npmmirror.com
 
 # 复制源码并构建
 COPY frontend frontend
