@@ -22,8 +22,15 @@ if [ "${mem_mb:-0}" -lt 3000 ] && [ -z "$(swapon --show --noheadings 2>/dev/null
 fi
 
 if ! command -v docker >/dev/null 2>&1; then
-  echo "→ 安装 Docker..."
-  curl -fsSL https://get.docker.com | sh
+  echo "→ 安装 Docker(阿里云源;get.docker.com 国内常被重置)..."
+  sudo apt-get install -y ca-certificates curl gnupg
+  sudo install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  sudo chmod a+r /etc/apt/keyrings/docker.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+  sudo apt-get update
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  echo "⚠ 镜像加速请配 /etc/docker/daemon.json(用你阿里云账号专属 mirror),否则拉基础镜像会慢/失败。"
 fi
 
 echo "→ 构建并启动(db + FastAPI + 前端 + Caddy)..."

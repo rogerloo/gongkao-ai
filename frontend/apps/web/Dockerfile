@@ -2,6 +2,8 @@
 # 构建上下文为仓库根(pnpm workspace 需要根清单与 @gongkao/ui 包)
 FROM node:22-slim AS build
 RUN corepack enable
+# 国内构建加速:用淘宝 npmmirror 镜像(registry.npmjs.org 在国内常超时)
+ENV npm_config_registry=https://registry.npmmirror.com
 WORKDIR /repo
 
 # 先复制清单,利用层缓存(仅清单变动才重装依赖)

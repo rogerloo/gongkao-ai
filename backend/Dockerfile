@@ -4,6 +4,9 @@ FROM python:3.12-slim
 # 装 uv(从官方镜像拷贝二进制,免编译)
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
+# 国内构建加速:用阿里云 PyPI 镜像(pypi.org 在国内常超时)
+ENV UV_DEFAULT_INDEX=https://mirrors.aliyun.com/pypi/simple/
+
 WORKDIR /app
 
 # 先装依赖(利用 Docker 层缓存:仅 lock 变化时才重装)
