@@ -1,0 +1,19 @@
+/*
+ * Tailwind v4 + AntD v6 共存策略
+ * --------------------------------
+ * AntD v6 自带 reset(CSS-in-JS),因此【关闭 Tailwind preflight】避免双重重置冲突。
+ * 做法:不整包 `@import "tailwindcss"`(它含 preflight/base),改为只引入 theme + utilities 两层。
+ */
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/* 让 Tailwind 扫描 streamdown 组件用到的类(node_modules 默认被忽略) */
+@source "../node_modules/streamdown/dist";
+
+html,
+body,
+#root {
+  height: 100%;
+}

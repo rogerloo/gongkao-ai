@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  frontend:
+    name: 前端 · lint / 格式 / 类型 / 构建
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - run: pnpm --filter web test
+      - run: pnpm build
+
+  backend:
+    name: 后端 · ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+        working-directory: backend
+      - run: uv run ruff check
+        working-directory: backend
+      - run: uv run pytest -q
+        working-directory: backend
+
+  e2e:
+    name: 前端 · E2E(Playwright,API mock)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # 装 Chrome(channel=chrome);用例 route 拦截 mock API,无需后端/LLM
+      - run: pnpm --filter web exec playwright install --with-deps chrome
+      - run: pnpm --filter web exec playwright test

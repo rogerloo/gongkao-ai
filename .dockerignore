@@ -1,0 +1,15 @@
+# 前端镜像构建上下文为仓库根 —— 排除体积大/无关项
+**/node_modules
+**/dist
+**/.venv
+**/__pycache__
+.git
+.github
+.claude
+*.md
+backend
+.env
+**/.env
+**/coverage
+**/.vite
+stage*

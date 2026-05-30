@@ -1,0 +1,46 @@
+# 单机三容器(PLAN §11):pgvector 数据库 + FastAPI 后端 + nginx 前端
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: gongkao
+      POSTGRES_PASSWORD: gongkao
+      POSTGRES_DB: gongkao
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U gongkao -d gongkao']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: ./backend
+    # LLM keys 仅在此注入(铁律 1);.env 不存在时不报错
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # 容器内连同一 compose 网络的 db 服务
+      DATABASE_URL: postgresql+asyncpg://gongkao:gongkao@db:5432/gongkao
+      CORS_ORIGINS: '["http://localhost:5173"]'
+    ports:
+      - '8000:8000'
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    # 构建上下文为仓库根(pnpm workspace),Dockerfile 在 web 包内
+    build:
+      context: .
+      dockerfile: frontend/apps/web/Dockerfile
+    ports:
+      - '5173:80'
+    depends_on:
+      - app
+
+volumes:
+  pgdata:

@@ -1,0 +1,42 @@
+[project]
+name = "gongkao-ai-backend"
+version = "0.0.0"
+description = "公考 AI 工作台后端(FastAPI)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "pydantic-settings>=2.6",
+    "sse-starlette>=2.1",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.31.0",
+    "pgvector>=0.4.2",
+    "openai>=2.38.0",
+    "pyyaml>=6.0.3",
+    "pyjwt>=2.13.0",
+    "bcrypt>=5.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.8",
+]
+
+# 应用型项目(非可发布包):uv 只管理虚拟环境,不构建本项目 wheel
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+# 120:适配中文注释/描述(ruff 按 East Asian Width 把中文算 2 宽)
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# B008:FastAPI 依赖注入惯用 Depends() 作默认参数,非缺陷
+ignore = ["B008"]

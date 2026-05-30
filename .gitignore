@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+.astro/
+
+# Python 工具缓存
+.ruff_cache/
+
+# Env & secrets(LLM keys 绝不入库)
+.env
+.env.*
+!.env.example
+!.env.prod.example
+
+# Data(大文件 / 全量数据走部署时拉取,不进 git)
+data/jobs.full.json
+data/*.dump
+*.sqlite
+
+# Postgres volume
+pgdata/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test / coverage
+coverage/
+.pytest_cache/
+playwright-report/
+test-results/
+
+# Sentry
+.sentryclirc
+
+# Claude Code 本地设置 + 项目说明(内部工具配置,不公开)
+.claude/settings.local.json
+CLAUDE.md
+
+# Husky 自动生成的 wrapper(install 时由 prepare 重建)
+.husky/_/
+
+# Playwright MCP 日志 / 验证截图(临时产物)
+.playwright-mcp/
+/stage*

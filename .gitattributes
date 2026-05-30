@@ -1,0 +1,10 @@
+# 统一文本文件行尾为 LF(项目部署在 Linux/Docker;husky 钩子脚本必须 LF,否则 sh 解析报错)
+* text=auto eol=lf
+
+# 二进制文件不做行尾转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff binary
+*.woff2 binary

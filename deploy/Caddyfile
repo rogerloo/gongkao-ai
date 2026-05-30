@@ -1,0 +1,10 @@
+# Caddy 自动 HTTPS(Let's Encrypt)。{$DOMAIN} 从容器环境变量读(compose 注入)。
+{$DOMAIN} {
+	encode zstd gzip
+
+	# 反代到 web(nginx):它负责 SPA 静态资源 + 把 /api 转发到 FastAPI
+	reverse_proxy web:80 {
+		# SSE 流式(对话 / Agent 逐 token):实时 flush,不缓冲
+		flush_interval -1
+	}
+}

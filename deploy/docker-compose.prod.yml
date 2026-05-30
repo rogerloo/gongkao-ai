@@ -1,0 +1,59 @@
+# 生产部署:单机 VPS/ECS + Caddy 自动 HTTPS。详见 ../DEPLOY.md
+# 拓扑:Caddy(:443 TLS)→ web(nginx:SPA + /api 转发)→ app(FastAPI:8000)→ db(pgvector)
+# 用法(在本 deploy/ 目录):
+#   cp .env.prod.example .env && vim .env       # 填域名/库密码/JWT/LLM key
+#   docker compose -f docker-compose.prod.yml up -d --build
+name: gongkao-ai
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # 注意:不对公网暴露端口,仅 compose 网络内可达(安全)
+
+  app:
+    build: ../backend
+    restart: unless-stopped
+    env_file: .env # DATABASE_URL / JWT_SECRET / CORS_ORIGINS / *_API_KEY 全在 .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .. # 构建上下文为仓库根(pnpm workspace)
+      dockerfile: frontend/apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - app
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      DOMAIN: ${DOMAIN} # Caddyfile 用 {$DOMAIN} 读,自动签 Let's Encrypt 证书
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data # 证书持久化(别删,否则重签触发 LE 限流)
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,14 @@
+**/dist
+**/node_modules
+**/*.tsbuildinfo
+pnpm-lock.yaml
+backend
+.husky/_
+.playwright-mcp
+*.png
+
+# 作者手写文档与工具配置,不参与项目格式化
+.claude
+CLAUDE.md
+PLAN.md
+README.md
