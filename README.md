@@ -9,7 +9,7 @@
 ![Postgres](https://img.shields.io/badge/Postgres-pgvector-4169E1?logo=postgresql&logoColor=white)
 ![DeepSeek](https://img.shields.io/badge/LLM-DeepSeek%20%2F%20%E6%99%BA%E8%B0%B1-7C3AED)
 
-> 🔗 **在线演示**:部署中 · 📄 [技术方案 PLAN.md](./PLAN.md) · 📦 [部署手册 DEPLOY.md](./DEPLOY.md) · 🖼 [更多截图](./docs/screenshots)
+> 🔗 **在线演示**:<https://app.gongye-edu.cn> · 演示账号 `admin` / `admin123` · 📄 [技术方案 PLAN.md](./PLAN.md) · 📦 [部署手册 DEPLOY.md](./DEPLOY.md) · 🖼 [更多截图](./docs/screenshots)
 >
 > 个人作品 · 数据已脱敏 · LLM key 仅在后端(前端只调自己的 API)
 
