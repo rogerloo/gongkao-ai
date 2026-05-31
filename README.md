@@ -210,3 +210,12 @@ GitHub Actions(`.github/workflows/ci.yml`)在每次 push / PR 跑:前端 lint + 
 
 - 📄 完整技术方案(技术选型 / 架构 / DB schema / 代码骨架 / roadmap):[PLAN.md](./PLAN.md)
 - 🖼 全部演示截图:[docs/screenshots/](./docs/screenshots)
+
+---
+
+## 关于作者
+
+**RogerLou**
+
+- 📮 [maskandjack000@gmail.com](mailto:maskandjack000@gmail.com)
+- 🐙 [github.com/rogerloo](https://github.com/rogerloo)
