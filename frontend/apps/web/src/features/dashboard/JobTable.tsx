@@ -50,6 +50,7 @@ export default function JobTable({ filters }: { filters: DashFilters }) {
 
   const table = useReactTable({ data: rows, columns, getCoreRowModel: getCoreRowModel() })
   const tableRows = table.getRowModel().rows
+  const totalWidth = table.getTotalSize()
   const parentRef = useRef<HTMLDivElement>(null)
   const virtualizer = useVirtualizer({
     count: tableRows.length,
@@ -71,19 +72,27 @@ export default function JobTable({ filters }: { filters: DashFilters }) {
       <div className="mb-1 text-xs text-gray-400">
         共 {data?.total ?? 0} 条,已加载 {rows.length} 条(虚拟滚动,仅渲染可视行)
       </div>
-      <div className="overflow-x-auto rounded border border-gray-200">
-        {/* 表头 */}
-        {table.getHeaderGroups().map((hg) => (
-          <div key={hg.id} className="flex border-b bg-gray-50 text-xs font-medium">
-            {hg.headers.map((h) => (
-              <div key={h.id} className="shrink-0 px-2 py-2" style={{ width: h.getSize() }}>
-                {flexRender(h.column.columnDef.header, h.getContext())}
-              </div>
-            ))}
-          </div>
-        ))}
-        {/* 虚拟滚动体 */}
-        <div ref={parentRef} className="overflow-auto" style={{ height: 440 }}>
+      {/* 单一滚动容器(X+Y 同一个)+ 表头 sticky 粘顶:避免外层/内层各一条横向滚动条 */}
+      <div
+        ref={parentRef}
+        className="overflow-auto rounded border border-gray-200"
+        style={{ height: 440 }}
+      >
+        <div style={{ width: totalWidth }}>
+          {/* 表头:粘顶,随同一容器横向滚动,始终与数据列对齐 */}
+          {table.getHeaderGroups().map((hg) => (
+            <div
+              key={hg.id}
+              className="sticky top-0 z-10 flex border-b bg-gray-50 text-xs font-medium"
+            >
+              {hg.headers.map((h) => (
+                <div key={h.id} className="shrink-0 px-2 py-2" style={{ width: h.getSize() }}>
+                  {flexRender(h.column.columnDef.header, h.getContext())}
+                </div>
+              ))}
+            </div>
+          ))}
+          {/* 虚拟滚动体:行宽锁定为表宽,只靠外层容器横滑 */}
           <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
             {virtualizer.getVirtualItems().map((vi) => {
               const row = tableRows[vi.index]
@@ -91,8 +100,12 @@ export default function JobTable({ filters }: { filters: DashFilters }) {
                 <div
                   key={row.id}
                   onClick={() => setSelected(row.original)}
-                  className="absolute flex w-full cursor-pointer border-b border-gray-100 text-xs hover:bg-blue-50"
-                  style={{ transform: `translateY(${vi.start}px)`, height: vi.size }}
+                  className="absolute flex cursor-pointer border-b border-gray-100 text-xs hover:bg-blue-50"
+                  style={{
+                    transform: `translateY(${vi.start}px)`,
+                    height: vi.size,
+                    width: totalWidth,
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <div
