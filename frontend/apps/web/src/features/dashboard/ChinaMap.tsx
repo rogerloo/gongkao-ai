@@ -13,8 +13,9 @@ interface GeoJson {
 // 只有这两省有数据,支持下钻;adcode 取自 DataV.GeoAtlas
 const PROVINCE_ADCODE: Record<string, string> = { 贵州: '520000', 青海: '630000' }
 
+// geojson 自托管于 public/geo/(同源),规避第三方 CDN(DataV)对生产域名防盗链导致的 403
 async function fetchGeo(adcode: string): Promise<GeoJson> {
-  const res = await fetch(`https://geo.datav.aliyun.com/areas_v3/bound/${adcode}_full.json`)
+  const res = await fetch(`${import.meta.env.BASE_URL}geo/${adcode}_full.json`)
   if (!res.ok) throw new Error('geojson 加载失败')
   return (await res.json()) as GeoJson
 }
